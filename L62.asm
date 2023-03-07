@@ -83,6 +83,7 @@
     mov ah, 40h
     mov bx, handle1
     mov cl, actinp1
+    mov ch, 0
     mov dx, offset inp1
     int 21h
     ;close
@@ -107,6 +108,7 @@
 
     ; write to file3
     mov ah, 40h
+
     mov bx, handle3
     mov cl, actinp2
     mov ch, 00
