@@ -32,7 +32,7 @@
     mov dx, 0ah; or 'dl' for 'db'
     mov ah, 2h
     int 21h 
-    MOV dl, 13 ;13d(odh) for CR
+    MOV dl, 13 ;13d(0dh) for CR
     MOV ah, 02h
     INT 21h
 
