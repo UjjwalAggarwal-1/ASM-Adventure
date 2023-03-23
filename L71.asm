@@ -5,15 +5,16 @@
 
 ; Data section contains the messages, the correct username, and password for comparison.
 
+maxLength dw 20h ; Maximum length for input
+
 msg1 db "enter User Name: $" ; Message 1: Prompt to enter the username
 usn1 db 20h dup("$") ; Correct username for comparison
-max1 db 20h ; Maximum length for input
-act1 db ? ; Placeholder for action
 inp1 db 20h dup("$") ; Buffer to store user's input for username
 
 msg2 db "enter password:$" ; Message 2: Prompt to enter the password
 pass1 db 20h dup("$") ; Correct password for comparison
 inp2 db 20h dup("$") ; Buffer to store user's input for password
+
 msg3 db "hello $" ; Message 3: Greeting message when both inputs are correct
 msg4 db "wrong username$" ; Message 4: Wrong username input
 msg5 db "wrong password$" ; Message 5: Wrong password input
@@ -33,7 +34,7 @@ file2 db 'pswd.txt',0
     int 21h
     mov bx, ax
     mov ah, 3fh
-    mov cx, 11
+    mov cx, 20h ; i can give a larger number, no problem
     lea dx, usn1
     int 21h
     
@@ -45,7 +46,7 @@ file2 db 'pswd.txt',0
     int 21h
     mov bx, ax
     mov ah, 3fh
-    mov cx, 11
+    mov cx, 20h
     lea dx, pass1
     int 21h
 
@@ -62,29 +63,38 @@ file2 db 'pswd.txt',0
     int 21h
 
     ; Take input from the user and store it in inp1.
+            ; old approach, this allows for a 0dh character (enter key) to be inputted in the data which is not desired
+            ; lea dx, max1
+            ; mov ah, 0ah
+            ; int 21h
 
-    lea dx, max1
-    mov ah, 0ah
+    mov cx, maxLength
+    lea di, inp1
+    nameInput:
+    mov ah, 01h
     int 21h
+    cmp al, 0dh
+    jz afterNameEntered
+    mov [di], al
+    inc di
+    dec cx
+    jnz nameInput
 
+    afterNameEntered:
     ; Compare the entered username with the stored username.
-        ;first check for length
-        cmp act1, 10
-        jnz wrongName
-    ;now check the first 10 chars
+            ; ;first check for length ,,, this was reqd when using old approach to take input for username
+            ; cmp act1, 10
+            ; jnz wrongName
+            ; ;now check the first 10 chars
     cld
     lea di, inp1
     lea si, usn1
-    mov cx, 10
+    mov cx, maxLength
     repe cmpsb
     jcxz l1
 
     ; If the username is incorrect, display the "wrong username" message and exit.
     wrongName:
-    lea dx, nline
-    mov ah, 09h
-    int 21h
-
     lea dx, msg4
     mov ah, 09h
     int 21h
@@ -95,10 +105,6 @@ file2 db 'pswd.txt',0
     ; If the username is correct, display the "enter password" message.
 
     l1:
-    lea dx, nline
-    mov ah, 09h
-    int 21h
-
     lea dx, msg2
     mov ah, 09h
     int 21h
@@ -109,7 +115,7 @@ file2 db 'pswd.txt',0
 
     ; Take password input from the user, masking the characters.
 
-    mov cx, 20h
+    mov cx, maxLength
     lea di, inp2
     l2:
     mov ah, 08h
@@ -127,7 +133,7 @@ file2 db 'pswd.txt',0
     ; Compare the entered password with the stored password.
     checkPassword:
     cld
-    mov cx, 6
+    mov cx, maxLength
     lea di, inp2
     lea si, pass1
     repe cmpsb
