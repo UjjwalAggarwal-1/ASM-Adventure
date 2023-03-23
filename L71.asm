@@ -1,3 +1,5 @@
+; ; Remember to close the file as well **credits: Arkya ProDev Aditya**
+
 ; This Assembly Language Program (ALP) checks the entered username and password, and displays a custom message accordingly.
 
 .model tiny
